@@ -1,0 +1,7 @@
+PAL Parser Structure:
+
+first: separate programs into their own sections, find hanging starts/ends, orphaned code
+second: analyze programs on their own (so labels don't get mixed up)
+
+make program objects that contain all lines of their code with original line numbers for reference
+remove comments
