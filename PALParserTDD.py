@@ -40,8 +40,7 @@ class parseFile(object):
     def startEnd(self, lineNum, line):
         if ('SRT' in line) and ('BEQ' not in line) and ('BR' not in line) and ('BGT' not in line) and ('DEF' not in line):
             self.starts.append(lineNum)
-            removeSpaces = line.replace(' ', '')
-            if "SRT" == removeSpaces:
+            if "SRT" == line.replace(' ', ''):
                 if self.start == False:
                     self.start = True
                     return None
@@ -52,14 +51,18 @@ class parseFile(object):
             else:
                 self.start = True
                 ind = self.starts.index(lineNum)
-                return '!!! SRT statement at line {0} has extra characters'.format(self.starts[ind] + 1)
+                return '!!! SRT stmt at line {0} has extra characters'.format(self.starts[ind] + 1)
         if ("END" in line) and ('BEQ' not in line) and ('BR' not in line) and ('BGT' not in line) and ('DEF' not in line):
             self.ends.append(lineNum)
-            if self.start == True:
-                self.start = False
+            if 'END' == line.split(':', 1)[-1].replace(' ', ''):
+                if self.start == True:
+                    self.start = False
+                else:
+                    self.start = False
+                    return '!!! END at line {0} does not have matching SRT'.format(lineNum + 1)
             else:
                 self.start = False
-                return '!!! END at line {0} does not have matching SRT'.format(lineNum + 1)
+                return '!!! END stmt at line {0} has extra characters'.format(lineNum + 1)
 
 
     # remove anything after ';'
@@ -77,7 +80,7 @@ if '__main__' == __name__:
     programs = parseFile(fileName)
 
     for line in programs.code:
-        print(line[0], line[1], line[2])
+        print(line[0], line[1].ljust(25), line[2])
 
     #for program in programs.list():
         #print(program.startLine)
