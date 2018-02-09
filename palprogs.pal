@@ -20,7 +20,7 @@ END: END
 END
 
 SRT ;while
- DEF V1ARR, 1000
+ DEF VARRR, 1000
 MOVE 0, R0
 MOVE 0, VARRR
 MOVE 11, R2  ;9 in octal
@@ -30,7 +30,8 @@ INC VARRR
 BR WHILE
 END: END
 
-SRT: ;if==
+LABEL:
+SRT ;if==
 MOVE 12, R0 ;10 in octal
 MOVE 12, R1
 BEQ R0, R1, EQ

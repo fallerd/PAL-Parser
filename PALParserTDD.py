@@ -49,23 +49,23 @@ class parseFile(object):
 
     # finds labels, returns errors
     def commandCheck(self, lineNum, line):
-        noLabel = line.split(': ', 1)[-1]
+        noLabel = line.split(':', 1)[-1].lstrip()
         if noLabel.replace(' ', '') == '':
             return "Label must be followed by a command"
-        if ('DEF ' in noLabel[0:4]) or \
-                ('MOVE ' in noLabel[0:5]) or \
-                ('COPY ' in noLabel[0:5]) or \
+        if ('DEF' in noLabel[0:3]) or \
+                ('MOVE' in noLabel[0:4]) or \
+                ('COPY' in noLabel[0:4]) or \
                 ('SRT' in noLabel[0:3]) or \
-                ('DEF ' in noLabel[0:4]) or \
-                ('ADD ' in noLabel[0:4]) or \
-                ('INC ' in noLabel[0:4]) or \
-                ('SUB ' in noLabel[0:4]) or \
-                ('DEC ' in noLabel[0:4]) or \
-                ('MUL ' in noLabel[0:4]) or \
-                ('DIV ' in noLabel[0:4]) or \
-                ('BEQ ' in noLabel[0:4]) or \
-                ('BGT ' in noLabel[0:4]) or \
-                ('BR ' in noLabel[0:3]) or \
+                ('DEF' in noLabel[0:3]) or \
+                ('ADD' in noLabel[0:3]) or \
+                ('INC' in noLabel[0:3]) or \
+                ('SUB' in noLabel[0:3]) or \
+                ('DEC' in noLabel[0:3]) or \
+                ('MUL' in noLabel[0:3]) or \
+                ('DIV' in noLabel[0:3]) or \
+                ('BEQ' in noLabel[0:3]) or \
+                ('BGT' in noLabel[0:3]) or \
+                ('BR' in noLabel[0:2]) or \
                 ('END' in noLabel[0:3]):
             return
         else:
@@ -74,7 +74,7 @@ class parseFile(object):
 
     # finds labels, returns errors
     def label(self, lineNum, line):
-        noLabel = line.split(': ', 1)[-1]
+        noLabel = line.split(':', 1)[-1].lstrip()
         if ('DEF' in noLabel[0:3]):
             noDEF = noLabel[4:]
             varName = noDEF.split(',', 1)[0]
@@ -83,6 +83,8 @@ class parseFile(object):
             for char in varName:
                 if self.isLetter(char) == False:
                     return "Variable names must be letters only"
+            varLoc = noDEF.split(',', 1)[-1].lstrip()
+            print(varLoc)
             #self.vars.append(None)
             return "def yo"
 
@@ -99,23 +101,23 @@ class parseFile(object):
                 else:
                     self.start = True
                     ind = self.starts.index(lineNum)
-                    return '!!! Program already has SRT at line {0}'.format(self.starts[ind - 1] + 1)
+                    return 'Program already has SRT at line {0}'.format(self.starts[ind - 1] + 1)
             else:
                 self.start = True
                 ind = self.starts.index(lineNum)
-                return '!!! SRT stmt at line {0} has extra characters'.format(self.starts[ind] + 1)
+                return 'SRT stmt at line {0} has extra characters'.format(self.starts[ind] + 1)
 
         if ("END" in line) and ('BEQ' not in line) and ('BR' not in line) and ('BGT' not in line) and ('DEF' not in line):
             self.ends.append(lineNum)
-            if 'END' == line.split(': ', 1)[-1].replace(' ', ''):
+            if 'END' == line.split(':', 1)[-1].lstrip().replace(' ', ''):
                 if self.start == True:
                     self.start = False
                 else:
                     self.start = False
-                    return '!!! END at line {0} does not have matching SRT'.format(lineNum + 1)
+                    return 'END at line {0} does not have matching SRT'.format(lineNum + 1)
             else:
                 self.start = False
-                return '!!! END stmt at line {0} has extra characters'.format(lineNum + 1)
+                return 'END stmt at line {0} has extra characters'.format(lineNum + 1)
 
 
     # remove anything after ';'
