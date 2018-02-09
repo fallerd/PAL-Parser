@@ -31,9 +31,9 @@ class parseFile(object):
     def parseLine(self, lineNum, line):
         startEndError = self.startEnd(lineNum, line)
         if startEndError != None:
-            self.code.append([lineNum, line, startEndError])
+            self.code.append([lineNum+1, line, startEndError])
         else:
-            self.code.append([lineNum, line, ''])
+            self.code.append([lineNum+1, line, ''])
         #print(lineNum, line)
 
     # find starts and ends
@@ -48,11 +48,11 @@ class parseFile(object):
                 else:
                     self.start = True
                     ind = self.starts.index(lineNum)
-                    return '!!! SRT at line {0} does not have matching END'
+                    return '!!! Program already has SRT at line {0}'.format(self.starts[ind - 1] + 1)
             else:
                 self.start = True
                 ind = self.starts.index(lineNum)
-                return '!!! SRT statement at line {0} has extra characters'.format(self.starts[ind - 1] + 1)
+                return '!!! SRT statement at line {0} has extra characters'.format(self.starts[ind] + 1)
         if ("END" in line) and ('BEQ' not in line) and ('BR' not in line) and ('BGT' not in line) and ('DEF' not in line):
             self.ends.append(lineNum)
             if self.start == True:
