@@ -6,9 +6,9 @@ INC R0
 BR END
 IF: DEC R0
 END: END
-SRT
-;whatevertest
-SRT ;for
+S SRT
+;blank comment line test
+SRT s ;for
 MOVE 0, R0
 MOVE 0, R1
 MOVE 11, R2  ;9 in octal
@@ -19,13 +19,14 @@ BR FOR
 END: END
 END
 
-SRT: ;while
+SRT ;while
+ DEF VAR, 1000
 MOVE 0, R0
-MOVE 0, R1
+MOVE 0, VAR
 MOVE 11, R2  ;9 in octal
-WHILE: BGT R1, R2, END
-ADD R0, R1, R0
-INC R1
+WHILE: BGT VAR, R2, END
+ADD R0, VAR, R0
+INC VAR
 BR WHILE
 END: END
 
@@ -36,6 +37,6 @@ BEQ R0, R1, EQ
 MOVE 12, R0
 BR END
 EQ: MOVE 24, R0
-END: END:
+END: END
 
 END
