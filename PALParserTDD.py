@@ -14,7 +14,7 @@ class parseFile(object):
     ends = []
     start = False
     vars = []
-    labels = {}
+    labels = [[],[]]
     define = False
 
     def __init__(self, fileName):
@@ -85,34 +85,45 @@ class parseFile(object):
             noLabel = line.split(':', 1)[-1].lstrip()
             if self.breakFind(noLabel):
                 breakLabel = self.sanitizeBreak(noLabel)
-                print("LABEL", breakLabel)
                 if self.validateLabel(breakLabel) is not None:
-                    return self.validateLabel(breakLabel), breakLabel
+                    return "{0}: {1}".format(self.validateLabel(breakLabel), breakLabel)
+                if self.labels[0]:
+                    for entry in self.labels[0]:
+                        if breakLabel in entry:
+                            return #"Break Label already created: {0}".format(breakLabel)
+                self.labels[0].append([breakLabel, lineNum+1])
+                return
+
             label = line.split(':', 1)[0]
             if self.validateLabel(label) is not None:
-                return self.validateLabel(label)
-            if label in self.labels:
-                return "Label already used"
-            else:
-                self.labels[label] = None
+                return "{0}: {1}".format(self.validateLabel(label), label)
+            if self.labels[1]:
+                for entry in self.labels[1]:
+                    if label in entry:
+                        return "Ambiguous label in use multiple times {0}".format(label)
+            self.labels[1].append([label, lineNum+1])
             return
+
         if self.breakFind(line):
             label = self.sanitizeBreak(line)
             if self.validateLabel(label) is not None:
-                return self.validateLabel(label)
-            if label in self.labels:
-                return "Label already used"
-            else:
-                self.labels[label] = None
+                return  "{0}: {1}".format(self.validateLabel(label), label)
+            if self.labels[0]:
+                for entry in self.labels[0]:
+                    if label in entry:
+                        return #"Break Label already created: {0}".format(label)
+            self.labels[0].append([label, lineNum+1])
+            return
+
         if ('DEF' in line[0:3]):
             if self.define == False:
                 return "DEF commands must follow SRT or DEF"
             noDEF = line[4:]
             varName = noDEF.split(',', 1)[0]
             if self.validateLabel(varName) is not None:
-                return self.validateLabel(varName)
+                return  "{0}: {1}".format(self.validateLabel(varName), varName)
             varLoc = noDEF.split(',', 1)[-1].lstrip()
-            print(varLoc)
+            #print(varLoc)
             #self.vars.append(None)
             return "def yo"
 
@@ -142,7 +153,6 @@ class parseFile(object):
 
     # find starts and ends, return errors
     def startEnd(self, lineNum, line):
-
         if ('SRT' in line[0:3]):
             self.starts.append(lineNum)
             if "SRT" == line.replace(' ', ''):
@@ -233,6 +243,8 @@ if '__main__' == __name__:
     programs = parseFile(fileName)
 
     for entry in programs.labels:
-        print(entry)
+        print("LISTTTTTT------------")
+        for each in entry:
+            print(each)
     for line in programs.code:
         print(str(line[0]).ljust(3), line[1].ljust(25), line[2])
