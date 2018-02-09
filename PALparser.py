@@ -26,18 +26,27 @@ class programList(object):
         def lineList(self):
             return self.lineList
 
+    code = []
     programs = []
     startEnd = []
 
     def __init__(self, fileName):
         self.file = open(fileName)
-        self.findPrograms(self.file)
-        self.buildPrograms(self.file)
+        self.scanFile(self.file)
+        for line in self.code:
+            print(line)
+        #self.findPrograms(self.file)
+        #self.buildPrograms(self.file)
 
+    # scan file into iterable list
+    def scanFile(self, file):
+        for lineNum, line in enumerate(file):
+            self.code.append(line)
 
     def list(self):
         return self.programs
 
+    # build list of program code blocks
     def buildPrograms(self, file):
         for srtend in self.startEnd:
             self.programs.append(self.program(srtend[1], srtend[3], file))
