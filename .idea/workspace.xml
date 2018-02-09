@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="06f882d3-53ee-45b6-a0a5-7fe3af38d742" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/PALParserTDD.py" afterPath="$PROJECT_DIR$/PALParserTDD.py" />
+      <change beforePath="$PROJECT_DIR$/palprogs.pal" afterPath="$PROJECT_DIR$/palprogs.pal" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -28,8 +29,8 @@
       <file leaf-file-name="PALParserTDD.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PALParserTDD.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="595">
-              <caret line="49" column="16" lean-forward="false" selection-start-line="49" selection-start-column="16" selection-end-line="49" selection-end-column="16" />
+            <state relative-caret-position="527">
+              <caret line="54" column="28" lean-forward="false" selection-start-line="54" selection-start-column="28" selection-end-line="54" selection-end-column="28" />
               <folding />
             </state>
           </provider>
@@ -254,8 +255,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/PALParserTDD.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="595">
-          <caret line="49" column="16" lean-forward="false" selection-start-line="49" selection-start-column="16" selection-end-line="49" selection-end-column="16" />
+        <state relative-caret-position="527">
+          <caret line="54" column="28" lean-forward="false" selection-start-line="54" selection-start-column="28" selection-end-line="54" selection-end-column="28" />
           <folding />
         </state>
       </provider>

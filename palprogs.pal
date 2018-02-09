@@ -6,6 +6,7 @@ INC R0
 BR END
 IF: DEC R0
 END: END
+SRT
 ;whatevertest
 SRT ;for
 MOVE 0, R0
@@ -16,6 +17,7 @@ ADD R0, R1, R0
 INC R1
 BR FOR
 END: END
+END
 
 SRT: ;while
 MOVE 0, R0
@@ -35,3 +37,5 @@ MOVE 12, R0
 BR END
 EQ: MOVE 24, R0
 END: END
+
+END

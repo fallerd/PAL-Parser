@@ -11,7 +11,8 @@ class parseFile(object):
 
     code = []
     programs = []
-    #startEnd = []
+    starts = []
+    ends = []
     start = False
 
     def __init__(self, fileName):
@@ -28,26 +29,37 @@ class parseFile(object):
 
     # scan line
     def parseLine(self, lineNum, line):
-        self.startEnd(lineNum, line)
-        self.code.append([lineNum,line])
+        startEndError = self.startEnd(lineNum, line)
+        if startEndError != None:
+            self.code.append([lineNum, line, startEndError])
+        else:
+            self.code.append([lineNum, line, ''])
         #print(lineNum, line)
 
     # find starts and ends
     def startEnd(self, lineNum, line):
-        if "SRT" in line:
-            if start == False:
-                self.startEnd.append(['start', lineNum])
-                start = True
+        if ('SRT' in line) and ('BEQ' not in line) and ('BR' not in line) and ('BGT' not in line) and ('DEF' not in line):
+            self.starts.append(lineNum)
+            removeSpaces = line.replace(' ', '')
+            if "SRT" == removeSpaces:
+                if self.start == False:
+                    self.start = True
+                    return None
+                else:
+                    self.start = True
+                    ind = self.starts.index(lineNum)
+                    return '!!! SRT at line {0} does not have matching END'
             else:
-                print('SRT at line', lineNum, 'does not have matching END')
-        if "END" in line and 'BEQ' not in line and 'BR' not in line and 'BGT' not in line:
-            if start == True:
-                self.startEnd[index].append('end')
-                self.startEnd[index].append(lineNum)
-                start = False
-                index += 1
+                self.start = True
+                ind = self.starts.index(lineNum)
+                return '!!! SRT statement at line {0} has extra characters'.format(self.starts[ind - 1] + 1)
+        if ("END" in line) and ('BEQ' not in line) and ('BR' not in line) and ('BGT' not in line) and ('DEF' not in line):
+            self.ends.append(lineNum)
+            if self.start == True:
+                self.start = False
             else:
-                print('END at line', lineNum + 1, 'does not have matching SRT')
+                self.start = False
+                return '!!! END at line {0} does not have matching SRT'.format(lineNum + 1)
 
 
     # remove anything after ';'
@@ -65,7 +77,7 @@ if '__main__' == __name__:
     programs = parseFile(fileName)
 
     for line in programs.code:
-        print(line[0], line[1])
+        print(line[0], line[1], line[2])
 
     #for program in programs.list():
         #print(program.startLine)
