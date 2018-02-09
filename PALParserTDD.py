@@ -67,17 +67,23 @@ class parseFile(object):
                 ('BGT ' in noLabel[0:4]) or \
                 ('BR ' in noLabel[0:3]) or \
                 ('END' in noLabel[0:3]):
-            #self.vars.append(None)
-            return "OK command"
+            return
         else:
             return "Command unknown"
 
 
     # finds labels, returns errors
     def label(self, lineNum, line):
-        noLabel = line.split(':', 1)[-1]
+        noLabel = line.split(': ', 1)[-1]
         if ('DEF' in noLabel[0:3]):
-            self.vars.append(None)
+            noDEF = noLabel[4:]
+            varName = noDEF.split(',', 1)[0]
+            if len(varName) > 5 or len(varName) < 1:
+                return "Variable name length invalid"
+            for char in varName:
+                if self.isLetter(char) == False:
+                    return "Variable names must be letters only"
+            #self.vars.append(None)
             return "def yo"
 
 
@@ -119,6 +125,53 @@ class parseFile(object):
             return noComment
         else:
             return line
+
+    # finds letters without regex
+    def isLetter(self, char):
+        if char == 'A' or \
+                char == 'B' or \
+                char == 'C' or \
+                char == 'C' or \
+                char == 'D' or \
+                char == 'E' or \
+                char == 'F' or \
+                char == 'G' or \
+                char == 'H' or \
+                char == 'I' or \
+                char == 'J' or \
+                char == 'K' or \
+                char == 'L' or \
+                char == 'M' or \
+                char == 'N' or \
+                char == 'O' or \
+                char == 'P' or \
+                char == 'Q' or \
+                char == 'R' or \
+                char == 'S' or \
+                char == 'T' or \
+                char == 'U' or \
+                char == 'V' or \
+                char == 'W' or \
+                char == 'X' or \
+                char == 'Y' or \
+                char == 'Z':
+            return True
+        else:
+            return False
+
+        # finds octal digits without regex
+    def isOctalDigit(self, char):
+        if char == '0' or \
+                char == '1' or \
+                char == '2' or \
+                char == '3' or \
+                char == '4' or \
+                char == '5' or \
+                char == '6' or \
+                char == '7':
+            return True
+        else:
+            return False
 
 
 if '__main__' == __name__:
