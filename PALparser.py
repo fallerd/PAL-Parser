@@ -34,7 +34,7 @@ class programList(object):
         self.file = open(fileName)
         self.scanFile(self.file)
         for line in self.code:
-            print(line)
+            print(line, end='')
         #self.findPrograms(self.file)
         #self.buildPrograms(self.file)
 
