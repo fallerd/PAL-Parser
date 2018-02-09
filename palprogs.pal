@@ -4,7 +4,7 @@ MOVE 0, R1
 BGT R0, R1, IF
 INC R0
 BR END
-IF: DEC R0
+IFFFFF: DEC R0
 END: END
 S SRT
 ;blank comment line test
@@ -12,7 +12,7 @@ SRT s ;for
 MOVE 0, R0
 MOVE 0, R1
 MOVE 11, R2  ;9 in octal
-FOR: BGT R1, R2, END
+FOR: BGT R1, R2, ENDDDDD
 ADD R0, R1, R0
 INC R1
 BR FOR
@@ -20,7 +20,7 @@ END: END
 END
 
 SRT ;while
- DEF VARRR, 1000
+DEF VARRRR, 1000
 MOVE 0, R0
 MOVE 0, VARRR
 MOVE 11, R2  ;9 in octal
@@ -32,7 +32,9 @@ END: END
 
 LABEL:
 SRT ;if==
+DEF TTTTT, 500
 MOVE 12, R0 ;10 in octal
+DEF VARRR, 1000
 MOVE 12, R1
 BEQ R0, R1, EQ
 MOVE 12, R0
