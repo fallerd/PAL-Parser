@@ -13,13 +13,14 @@ class parseFile(object):
     starts = []
     ends = []
     start = False
-    vars = []
+    vars = [[],[]]
     labels = [[],[]]
     define = False
 
     def __init__(self, fileName):
         self.file = open(fileName)
         self.scanFile(self.file)
+        # check errors listed in VAR and LABEL lists, apply to lines that aren't already in error.
         #self.outputErrorFile(self.code)
 
 
@@ -81,38 +82,28 @@ class parseFile(object):
     # finds labels, returns errors
     def label(self, lineNum, line):
         if ':' in line:
-            ################## need to add checks for breaks in these lines also, like WHILE: BGT VARRR, R2, END
             noLabel = line.split(':', 1)[-1].lstrip()
-            if self.breakFind(noLabel):
-                breakLabel = self.sanitizeBreak(noLabel)
-                if self.validateLabel(breakLabel) is not None:
-                    return "{0}: {1}".format(self.validateLabel(breakLabel), breakLabel)
-                if self.labels[0]:
-                    for entry in self.labels[0]:
-                        if breakLabel in entry:
-                            return #"Break Label already created: {0}".format(breakLabel)
-                self.labels[0].append([breakLabel, lineNum+1])
-                return
-
+            if self.branchFind(noLabel):
+                branchLabel = self.sanitizeBranch(noLabel)
+                if self.validateLabel(branchLabel) is not None:
+                    return "{0}: {1}".format(self.validateLabel(branchLabel), branchLabel)
+                if not self.findLabels("branchTo", branchLabel):
+                    self.labels[0].append([branchLabel, lineNum+1])
             label = line.split(':', 1)[0]
             if self.validateLabel(label) is not None:
                 return "{0}: {1}".format(self.validateLabel(label), label)
-            if self.labels[1]:
-                for entry in self.labels[1]:
-                    if label in entry:
-                        return "Ambiguous label in use multiple times {0}".format(label)
-            self.labels[1].append([label, lineNum+1])
-            return
+            if self.findLabels("branchFrom", label):
+                return "Ambiguous label: \'{0}\' in use multiple times".format(label)
+            else:
+                self.labels[1].append([label, lineNum + 1])
+                return
 
-        if self.breakFind(line):
-            label = self.sanitizeBreak(line)
+        if self.branchFind(line):
+            label = self.sanitizeBranch(line)
             if self.validateLabel(label) is not None:
                 return  "{0}: {1}".format(self.validateLabel(label), label)
-            if self.labels[0]:
-                for entry in self.labels[0]:
-                    if label in entry:
-                        return #"Break Label already created: {0}".format(label)
-            self.labels[0].append([label, lineNum+1])
+            if not self.findLabels("branchTo", label):
+                self.labels[0].append([label, lineNum + 1])
             return
 
         if ('DEF' in line[0:3]):
@@ -123,16 +114,41 @@ class parseFile(object):
             if self.validateLabel(varName) is not None:
                 return  "{0}: {1}".format(self.validateLabel(varName), varName)
             varLoc = noDEF.split(',', 1)[-1].lstrip()
-            #print(varLoc)
+            if self.validateLoc(varLoc):
+                return "{0}: \'{1}\'".format(self.validateLoc(varLoc), varLoc)
+            print(varLoc)
             #self.vars.append(None)
             return "def yo"
 
-    # finds breaks in lines
-    def breakFind(self, line):
+
+    # searches given label list for matches
+    def findLabels(self, type, label):
+        if type == 'branchTo':
+            if self.labels[0]:
+                for entry in self.labels[0]:
+                    if label in entry:
+                        return True
+                return False
+            else:
+                return False
+
+        if type == 'branchFrom':
+            if self.labels[1]:
+                for entry in self.labels[1]:
+                    if label in entry:
+                        return True
+                return False
+            else:
+                return False
+
+
+    # finds branchs in lines
+    def branchFind(self, line):
         if ('BEQ' in line[0:3]) or ('BR' in line[0:2]) or ('BGT' in line[0:3]):
             return True
         else:
             return False
+
 
     # validates labels
     def validateLabel(self, label):
@@ -142,14 +158,25 @@ class parseFile(object):
             if self.isLetter(char) == False:
                 return "Variable or Label names must be letters only"
 
-    # returns label from break line
-    def sanitizeBreak(self, line):
+
+    # validates memory locations
+    def validateLoc(self, loc):
+        if len(loc) < 1:
+            return "Memory location length invalid"
+        for char in loc:
+            if self.isOctalDigit(char) == False:
+                return "Memory locations must be octal digits only"
+
+
+    # returns label from branch line
+    def sanitizeBranch(self, line):
         if ('BEQ' in line[0:3]) or ('BGT' in line[0:3]):
             label = line.rsplit(',', 1)[-1].lstrip()
         if ('BR' in line[0:2]):
             label = line.replace('BR', '')
             label = label.lstrip()
         return label
+
 
     # find starts and ends, return errors
     def startEnd(self, lineNum, line):
@@ -242,9 +269,9 @@ if '__main__' == __name__:
     fileName +=".pal"
     programs = parseFile(fileName)
 
-    for entry in programs.labels:
+    '''for entry in programs.labels:
         print("LISTTTTTT------------")
         for each in entry:
-            print(each)
+            print(each)'''
     for line in programs.code:
         print(str(line[0]).ljust(3), line[1].ljust(25), line[2])
