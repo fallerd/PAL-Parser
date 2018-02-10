@@ -1,7 +1,7 @@
-PAL Parser Structure:
-
-first: separate programs into their own sections, find hanging starts/ends, orphaned code
-second: analyze programs on their own (so labels don't get mixed up)
-
-make program objects that contain all lines of their code with original line numbers for reference
-remove comments
+open filename
+scanfile: goes through each line, removes comments, strips leading spaces, does parseLine
+	parseline:
+		commandCheck: checks if a valid command starts the line, adds check for DEF's following starts
+		startEnd: if it is a start/end line, check validity
+		labelBranchCheck: checks labels/vars and adds to tables, checks branches, checks branch args
+		

@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="06f882d3-53ee-45b6-a0a5-7fe3af38d742" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/PALParserTDD.py" afterPath="$PROJECT_DIR$/PALParserTDD.py" />
+      <change beforePath="$PROJECT_DIR$/ParserStructure.txt" afterPath="$PROJECT_DIR$/ParserStructure.txt" />
       <change beforePath="$PROJECT_DIR$/palprogs.pal" afterPath="$PROJECT_DIR$/palprogs.pal" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -29,8 +31,8 @@
       <file leaf-file-name="PALParserTDD.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PALParserTDD.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2391">
-              <caret line="141" column="28" lean-forward="true" selection-start-line="141" selection-start-column="28" selection-end-line="141" selection-end-column="28" />
+            <state relative-caret-position="390">
+              <caret line="76" column="12" lean-forward="true" selection-start-line="76" selection-start-column="12" selection-end-line="76" selection-end-column="38" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
               </folding>
@@ -57,10 +59,15 @@
       <find>print(</find>
       <find>Break</find>
       <find>searchLabels</find>
+      <find>sanitizeBranch</find>
+      <find>varValidate</find>
+      <find>validateLabel</find>
+      <find>get3</find>
     </findStrings>
     <replaceStrings>
       <replace>Branch</replace>
       <replace>findLabels</replace>
+      <replace>getBranchLabel</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -95,7 +102,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -107,7 +114,7 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -223,6 +230,46 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/PALparser.py">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PALParserTDD.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="374">
+          <caret line="22" column="39" lean-forward="false" selection-start-line="22" selection-start-column="39" selection-end-line="22" selection-end-column="39" />
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PALparser.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PALParserTDD.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1479">
+          <caret line="89" column="90" lean-forward="true" selection-start-line="89" selection-start-column="90" selection-end-line="89" selection-end-column="90" />
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PALparser.py">
+      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="748">
           <caret line="46" column="28" lean-forward="false" selection-start-line="46" selection-start-column="28" selection-end-line="46" selection-end-column="28" />
           <folding>
@@ -293,8 +340,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/PALParserTDD.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2391">
-          <caret line="141" column="28" lean-forward="true" selection-start-line="141" selection-start-column="28" selection-end-line="141" selection-end-column="28" />
+        <state relative-caret-position="390">
+          <caret line="76" column="12" lean-forward="true" selection-start-line="76" selection-start-column="12" selection-end-line="76" selection-end-column="38" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
           </folding>
