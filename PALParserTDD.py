@@ -20,6 +20,8 @@ class parseFile(object):
     def __init__(self, fileName):
         self.file = open(fileName)
         self.scanFile(self.file)
+        self.checkOrphans()
+        
         # check for orphaned unmatched lines in VAR and label lists, mark those that aren't already in error list
         #self.outputErrorFile(self.code)
 
@@ -61,12 +63,12 @@ class parseFile(object):
         if ('MOVE' in line[0:4]):
             line = line[4:].lstrip()
             args = self.get2args(line)
-            return
+            return self.validateMoveArgs(args[0], args[1])
 
         if ('COPY' in line[0:4]):
             line = line[4:].lstrip()
             args = self.get2args(line)
-            return
+            return self.validate2RegArgs(args[0], args[1])
 
         if ('ADD' in line[0:3]) or \
                 ('SUB' in line[0:3]) or \
@@ -74,8 +76,7 @@ class parseFile(object):
                 ('DIV' in line[0:3]):
             line = line[3:].lstrip()
             args = self.get3args(line)
-            print ("math args:", args)
-            return
+            return self.validate3RegArgs(args[0], args[1], args[2])
 
         if ('INC' in line[0:3]) or \
                 ('DEC' in line[0:3]):
@@ -84,9 +85,6 @@ class parseFile(object):
                 return
             else:
                 return self.validateLabel(line)
-
-
-
 
 
     # finds labels, returns errors
@@ -143,7 +141,7 @@ class parseFile(object):
     def checkBranchArgs(self, line, lineNum):
         if ('BEQ' in line[0:3]) or ('BGT' in line[0:3]):
             args = self.get2args(line[3:].lstrip().rsplit(',', 1)[0])
-            return self.validateBranchArgs(args[0], args[1])
+            return self.validate2RegArgs(args[0], args[1])
         return
 
 
@@ -161,8 +159,20 @@ class parseFile(object):
         return [arg1, arg23[0], arg23[1]]
 
 
-    # checks branch statement args for validity
-    def validateBranchArgs(self, arg1, arg2):
+    # checks 3 regular statement args for vailidity
+    def validate3RegArgs(self, arg1, arg2, arg3):
+        if self.isRegister(arg1):
+            return self.validate2RegArgs(arg2, arg3)
+        else:
+            arg1Valid = self.validateLabel(arg1)
+            if arg1Valid is None:
+                return self.validate2RegArgs(arg2, arg3)
+            else:
+                return arg1Valid
+
+
+    # checks 2 regular statement args for validity
+    def validate2RegArgs(self, arg1, arg2):
         if self.isRegister(arg1):
             if self.isRegister(arg2):
                 return
@@ -177,6 +187,19 @@ class parseFile(object):
                     return self.validateLabel(arg2)
             else:
                 return arg1Valid
+
+
+    # checks args for move command
+    def validateMoveArgs(self, arg1, arg2):
+        if len(arg1) < 1:
+            return "Value length invalid"
+        for char in arg1:
+            if self.isOctalDigit(char) is False:
+                return "Values must be octal digits only: \'{0}\'".format(arg1)
+        if self.isRegister(arg2):
+            return
+        else:
+            return self.validateLabel(arg2)
 
 
     # searches given var list for matches
