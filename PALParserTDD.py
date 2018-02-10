@@ -13,7 +13,7 @@ class parseFile(object):
     starts = []
     ends = []
     start = False
-    vars = [[],[]]
+    varList = [[],[]]
     labels = [[],[]]
     define = False
 
@@ -21,7 +21,7 @@ class parseFile(object):
         self.file = open(fileName)
         self.scanFile(self.file)
         self.checkOrphans()
-        
+
         # check for orphaned unmatched lines in VAR and label lists, mark those that aren't already in error list
         #self.outputErrorFile(self.code)
 
@@ -117,7 +117,7 @@ class parseFile(object):
             if varValidated is not None:
                 return  varValidated
             if not self.findVars('defined', varName):
-                self.vars[0].append([varName, lineNum + 1])
+                self.varList[0].append([varName, lineNum + 1])
             else:
                 return "Var name already defined in namespace: \'{0}\'".format(varName)
             varLoc = noDEF.split(',', 1)[-1].lstrip()
@@ -205,8 +205,8 @@ class parseFile(object):
     # searches given var list for matches
     def findVars(self, type, label):
         if type == 'defined':
-            if self.vars[0]:
-                for entry in self.vars[0]:
+            if self.varList[0]:
+                for entry in self.varList[0]:
                     if label in entry:
                         return True
                 return False
@@ -214,8 +214,8 @@ class parseFile(object):
                 return False
 
         if type == 'inUse':
-            if self.vars[1]:
-                for entry in self.vars[1]:
+            if self.varList[1]:
+                for entry in self.varList[1]:
                     if label in entry:
                         return True
                 return False
@@ -412,7 +412,7 @@ if '__main__' == __name__:
     fileName +=".pal"
     programs = parseFile(fileName)
 
-    #for entry in programs.vars:
+    #for entry in programs.varList:
        # print("var",entry)
 
     for line in programs.code:
