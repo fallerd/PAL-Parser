@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="06f882d3-53ee-45b6-a0a5-7fe3af38d742" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/PALParserTDD.py" afterPath="$PROJECT_DIR$/PALParserTDD.py" />
+      <change beforePath="$PROJECT_DIR$/palprogs.pal" afterPath="$PROJECT_DIR$/palprogs.pal" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -28,8 +29,8 @@
       <file leaf-file-name="PALParserTDD.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PALParserTDD.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="476">
-              <caret line="190" column="16" lean-forward="false" selection-start-line="190" selection-start-column="16" selection-end-line="191" selection-end-column="20" />
+            <state relative-caret-position="612">
+              <caret line="51" column="28" lean-forward="true" selection-start-line="51" selection-start-column="28" selection-end-line="51" selection-end-column="28" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
               </folding>
@@ -70,6 +71,8 @@
       <find>labels</find>
       <find>find</find>
       <find>self.varList[1].append</find>
+      <find>self.findVars(&quot;inUse&quot;,</find>
+      <find>varList[1].append</find>
     </findStrings>
     <replaceStrings>
       <replace>Branch</replace>
@@ -349,8 +352,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/PALParserTDD.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="190" column="16" lean-forward="false" selection-start-line="190" selection-start-column="16" selection-end-line="191" selection-end-column="20" />
+        <state relative-caret-position="612">
+          <caret line="51" column="28" lean-forward="true" selection-start-line="51" selection-start-column="28" selection-end-line="51" selection-end-column="28" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
           </folding>

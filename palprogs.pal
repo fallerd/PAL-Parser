@@ -8,6 +8,9 @@ BR ENDD
 IF: DEC R0
 ENDD: END
 
+
+
+ADD VAR, R0,R1
 SRT ;for
 MOVE 0, R0
 MOVE 0, R1

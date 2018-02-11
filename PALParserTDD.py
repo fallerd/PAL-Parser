@@ -16,6 +16,7 @@ class parseFile(object):
     varList = [[],[]]
     labels = [[],[]]
     define = False
+    index = 0
 
     def __init__(self, fileName):
         self.file = open(fileName)
@@ -43,9 +44,10 @@ class parseFile(object):
                 if definedVar[0] == variable[0]:
                     linked = True
             if not linked:
-                print("NOT LINKED", variable[0])
-                if not self.code[variable[1]-1][2]:
-                    self.code[variable[1]-1][2] = "Variable never defined"
+                print("NOT LINKED", variable[0], variable[1], variable[2])
+                #print (variable[1], variable[2])
+                if not self.code[variable[2]][2]:
+                    self.code[variable[2]][2] = "Variable never defined: \'{0}\'".format(variable[0])
             else:
                 linked = False
 
@@ -57,20 +59,25 @@ class parseFile(object):
         commandUnknown = self.commandCheck(lineNum, line)
         if commandUnknown != None:
             self.code.append([lineNum + 1, line, commandUnknown])
+            self.index +=1
         else:
             startEndError = self.startEnd(lineNum, line)
             if startEndError != None:
                 self.code.append([lineNum + 1, line, startEndError])
+                self.index += 1
             else:
                 labelError = self.labelBranchCheck(lineNum, line)
                 if labelError != None:
                     self.code.append([lineNum + 1, line, labelError])
+                    self.index += 1
                 else:
                     operationError = self.operationCheck(lineNum, line)
                     if operationError != None:
                         self.code.append([lineNum + 1, line, operationError])
+                        self.index += 1
                     else:
                         self.code.append([lineNum + 1, line, ""])
+                        self.index += 1
 
 
     # checks arithmetic operations
@@ -103,8 +110,7 @@ class parseFile(object):
             else:
                 valid = self.validateLabel(line)
                 if valid is None:
-                    if not self.findVars("inUse", line):
-                        self.varList[1].append([line, lineNum + 1])
+                    self.varList[1].append([line, lineNum + 1, self.index])
                 else:
                     return valid
 
@@ -188,8 +194,7 @@ class parseFile(object):
         else:
             arg1Valid = self.validateLabel(arg1)
             if arg1Valid is None:
-                if not self.findVars("inUse", arg1):
-                    self.varList[1].append([arg1, lineNum+1])
+                self.varList[1].append([arg1, lineNum+1, self.index])
                 return self.validate2RegArgs(arg2, arg3, lineNum)
             else:
                 return arg1Valid
@@ -203,23 +208,20 @@ class parseFile(object):
             else:
                 arg2Valid = self.validateLabel(arg2)
                 if arg2Valid is None:
-                    if not self.findVars("inUse", arg2):
-                        self.varList[1].append([arg2, lineNum+1])
+                    self.varList[1].append([arg2, lineNum+1, self.index])
                     return
                 else:
                     return arg2Valid
         else:
             arg1Valid = self.validateLabel(arg1)
             if arg1Valid is None:
-                if not self.findVars("inUse", arg1):
-                    self.varList[1].append([arg1, lineNum+1])
+                self.varList[1].append([arg1, lineNum+1])
                 if self.isRegister(arg2):
                     return
                 else:
                     arg2Valid = self.validateLabel(arg2)
                     if arg2Valid is None:
-                        if not self.findVars("inUse", arg2):
-                            self.varList[1].append([arg2, lineNum+1])
+                        self.varList[1].append([arg2, lineNum+1, self.index])
                         return
                     else:
                         return arg2Valid
@@ -237,8 +239,7 @@ class parseFile(object):
         if self.isRegister(arg2):
             return
         else:
-            if not self.findVars("inUse", arg2):
-                self.varList[1].append([arg2, lineNum+1])
+            self.varList[1].append([arg2, lineNum+1, self.index])
             return self.validateLabel(arg2)
 
 
