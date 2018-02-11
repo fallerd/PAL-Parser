@@ -35,6 +35,23 @@ class parseFile(object):
                 self.parseLine(lineNum, line.strip("\n"))
 
 
+    # checks var and label lists for orphans and marks those lines with errors
+    def checkOrphans(self):
+        linked = False
+        for variable in self.varList[1]:
+            for definedVar in self.varList[0]:
+                if definedVar[0] == variable[0]:
+                    linked = True
+            if not linked:
+                print("NOT LINKED", variable[0])
+                if not self.code[variable[1]-1][2]:
+                    self.code[variable[1]-1][2] = "Variable never defined"
+            else:
+                linked = False
+
+        return
+
+
     # scan line for start/end, labels,
     def parseLine(self, lineNum, line):
         commandUnknown = self.commandCheck(lineNum, line)
@@ -53,7 +70,7 @@ class parseFile(object):
                     if operationError != None:
                         self.code.append([lineNum + 1, line, operationError])
                     else:
-                        self.code.append([lineNum + 1, line, ''])
+                        self.code.append([lineNum + 1, line, ""])
 
 
     # checks arithmetic operations
@@ -63,12 +80,12 @@ class parseFile(object):
         if ('MOVE' in line[0:4]):
             line = line[4:].lstrip()
             args = self.get2args(line)
-            return self.validateMoveArgs(args[0], args[1])
+            return self.validateMoveArgs(args[0], args[1], lineNum)
 
         if ('COPY' in line[0:4]):
             line = line[4:].lstrip()
             args = self.get2args(line)
-            return self.validate2RegArgs(args[0], args[1])
+            return self.validate2RegArgs(args[0], args[1], lineNum)
 
         if ('ADD' in line[0:3]) or \
                 ('SUB' in line[0:3]) or \
@@ -76,7 +93,7 @@ class parseFile(object):
                 ('DIV' in line[0:3]):
             line = line[3:].lstrip()
             args = self.get3args(line)
-            return self.validate3RegArgs(args[0], args[1], args[2])
+            return self.validate3RegArgs(args[0], args[1], args[2], lineNum)
 
         if ('INC' in line[0:3]) or \
                 ('DEC' in line[0:3]):
@@ -84,7 +101,12 @@ class parseFile(object):
             if self.isRegister(line) is True:
                 return
             else:
-                return self.validateLabel(line)
+                valid = self.validateLabel(line)
+                if valid is None:
+                    if not self.findVars("inUse", line):
+                        self.varList[1].append([line, lineNum + 1])
+                else:
+                    return valid
 
 
     # finds labels, returns errors
@@ -141,7 +163,7 @@ class parseFile(object):
     def checkBranchArgs(self, line, lineNum):
         if ('BEQ' in line[0:3]) or ('BGT' in line[0:3]):
             args = self.get2args(line[3:].lstrip().rsplit(',', 1)[0])
-            return self.validate2RegArgs(args[0], args[1])
+            return self.validate2RegArgs(args[0], args[1], lineNum)
         return
 
 
@@ -160,37 +182,53 @@ class parseFile(object):
 
 
     # checks 3 regular statement args for vailidity
-    def validate3RegArgs(self, arg1, arg2, arg3):
+    def validate3RegArgs(self, arg1, arg2, arg3, lineNum):
         if self.isRegister(arg1):
-            return self.validate2RegArgs(arg2, arg3)
+            return self.validate2RegArgs(arg2, arg3, lineNum)
         else:
             arg1Valid = self.validateLabel(arg1)
             if arg1Valid is None:
-                return self.validate2RegArgs(arg2, arg3)
+                if not self.findVars("inUse", arg1):
+                    self.varList[1].append([arg1, lineNum+1])
+                return self.validate2RegArgs(arg2, arg3, lineNum)
             else:
                 return arg1Valid
 
 
     # checks 2 regular statement args for validity
-    def validate2RegArgs(self, arg1, arg2):
+    def validate2RegArgs(self, arg1, arg2, lineNum):
         if self.isRegister(arg1):
             if self.isRegister(arg2):
                 return
             else:
-                return self.validateLabel(arg2)
+                arg2Valid = self.validateLabel(arg2)
+                if arg2Valid is None:
+                    if not self.findVars("inUse", arg2):
+                        self.varList[1].append([arg2, lineNum+1])
+                    return
+                else:
+                    return arg2Valid
         else:
             arg1Valid = self.validateLabel(arg1)
             if arg1Valid is None:
+                if not self.findVars("inUse", arg1):
+                    self.varList[1].append([arg1, lineNum+1])
                 if self.isRegister(arg2):
                     return
                 else:
-                    return self.validateLabel(arg2)
+                    arg2Valid = self.validateLabel(arg2)
+                    if arg2Valid is None:
+                        if not self.findVars("inUse", arg2):
+                            self.varList[1].append([arg2, lineNum+1])
+                        return
+                    else:
+                        return arg2Valid
             else:
                 return arg1Valid
 
 
     # checks args for move command
-    def validateMoveArgs(self, arg1, arg2):
+    def validateMoveArgs(self, arg1, arg2, lineNum):
         if len(arg1) < 1:
             return "Value length invalid"
         for char in arg1:
@@ -199,6 +237,8 @@ class parseFile(object):
         if self.isRegister(arg2):
             return
         else:
+            if not self.findVars("inUse", arg2):
+                self.varList[1].append([arg2, lineNum+1])
             return self.validateLabel(arg2)
 
 
@@ -412,8 +452,8 @@ if '__main__' == __name__:
     fileName +=".pal"
     programs = parseFile(fileName)
 
-    #for entry in programs.varList:
-       # print("var",entry)
+    for entry in programs.varList:
+        print("var",entry)
 
     for line in programs.code:
         print(str(line[0]).ljust(3), line[1].ljust(25), line[2])

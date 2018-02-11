@@ -28,8 +28,8 @@
       <file leaf-file-name="PALParserTDD.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PALParserTDD.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="725">
-              <caret line="414" column="34" lean-forward="false" selection-start-line="414" selection-start-column="27" selection-end-line="414" selection-end-column="34" />
+            <state relative-caret-position="476">
+              <caret line="190" column="16" lean-forward="false" selection-start-line="190" selection-start-column="16" selection-end-line="191" selection-end-column="20" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
               </folding>
@@ -61,12 +61,22 @@
       <find>validateLabel</find>
       <find>get3</find>
       <find>vars</find>
+      <find>varList</find>
+      <find>findVars</find>
+      <find>varList.app</find>
+      <find>3args</find>
+      <find>validate3R</find>
+      <find>INC</find>
+      <find>labels</find>
+      <find>find</find>
+      <find>self.varList[1].append</find>
     </findStrings>
     <replaceStrings>
       <replace>Branch</replace>
       <replace>findLabels</replace>
       <replace>getBranchLabel</replace>
       <replace>varList</replace>
+      <replace>varList[1].app</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -339,8 +349,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/PALParserTDD.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="725">
-          <caret line="414" column="34" lean-forward="false" selection-start-line="414" selection-start-column="27" selection-end-line="414" selection-end-column="34" />
+        <state relative-caret-position="476">
+          <caret line="190" column="16" lean-forward="false" selection-start-line="190" selection-start-column="16" selection-end-line="191" selection-end-column="20" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
           </folding>
