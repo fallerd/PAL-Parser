@@ -5,3 +5,14 @@ scanfile: goes through each line, removes comments, strips leading spaces, does 
 		startEnd: if it is a start/end line, check validity
 		labelBranchCheck: checks labels/vars and adds to tables, checks branches, checks branch args
 		
+cd C:\CWMT\section2team1\CWMT\packages\OpenCover.4.6.519\tools
+
+C:\CWMT\section2team1\CWMT\CWTesting\bin\Debug\CWTesting.dll
+CWMasterTeacherDomain.dll
+
+OpenCover.Console.exe -target:"C:\CWMT\section2team1\CWMT\CWTesting\bin\Debug\CWTesting.dll" -output:"C:\CWMT\coverage.xml" -register:user
+
+OpenCover.Console.exe -target:"C:\CWMT\section2team1\CWMT\packages\NUnit.ConsoleRunner.3.5.0\tools\nunit3-console.exe" -targetargs:"C:\CWMT\section2team1\CWMT\CWTesting\bin\Debug\CWTesting.dll" -register:user -output:"C:\CWMT\coverage.xml" -filter:"+[*]* -[*CWMasterTeacherDataModel*]*"
++userDomain*
+
+"C:\CWMT\section2team1\CWMT\packages\NUnit.ConsoleRunner.3.5.0\tools\nunit3-console.exe"

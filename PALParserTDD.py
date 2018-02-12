@@ -19,12 +19,16 @@ class parseFile(object):
     index = 0
 
     def __init__(self, fileName):
-        self.file = open(fileName)
+        self.file = open(fileName + ".pal")
         self.scanFile(self.file)
         self.checkOrphans()
+        self.outputErrorFile(fileName + ".log")
 
-        # check for orphaned unmatched lines in VAR and label lists, mark those that aren't already in error list
-        #self.outputErrorFile(self.code)
+
+    def outputErrorFile(self, fileName):
+        f = open(fileName, 'w')
+        f.write('hello world')
+        f.close()
 
 
     # scan file, remove comments, ignore blanks, remove leading whitespace
@@ -38,19 +42,27 @@ class parseFile(object):
 
     # checks var and label lists for orphans and marks those lines with errors
     def checkOrphans(self):
-        linked = False
+        linkedVar = False
         for variable in self.varList[1]:
             for definedVar in self.varList[0]:
                 if definedVar[0] == variable[0]:
-                    linked = True
-            if not linked:
-                print("NOT LINKED", variable[0], variable[1], variable[2])
-                #print (variable[1], variable[2])
+                    linkedVar = True
+            if not linkedVar:
+                #print("NOT LINKED", variable[0], variable[1], variable[2])
                 if not self.code[variable[2]][2]:
-                    self.code[variable[2]][2] = "Variable never defined: \'{0}\'".format(variable[0])
+                    self.code[variable[2]][2] = "Variable has invalid DEF stmt or never defined: \'{0}\'".format(variable[0])
             else:
-                linked = False
-
+                linkedVar = False
+        linkedLabel = False
+        for label in self.labels[0]:
+            for labelled in self.labels[1]:
+                if label[0] == labelled[0]:
+                    linkedLabel = True
+            if not linkedLabel:
+                print("not linked:", label)
+                self.code[label[2]][2] = "Branch label on invalid line or never defined: \'{0}\'".format(label[0])
+            else:
+                linkedLabel = False
         return
 
 
@@ -161,7 +173,7 @@ class parseFile(object):
         if labelValidated is not None:
             return  labelValidated
         if not self.findLabels("branchTo", label):
-            self.labels[0].append([label, lineNum + 1])
+            self.labels[0].append([label, lineNum + 1, self.index])
         return self.checkBranchArgs(line, lineNum)
 
 
@@ -215,7 +227,7 @@ class parseFile(object):
         else:
             arg1Valid = self.validateLabel(arg1)
             if arg1Valid is None:
-                self.varList[1].append([arg1, lineNum+1])
+                self.varList[1].append([arg1, lineNum+1, self.index])
                 if self.isRegister(arg2):
                     return
                 else:
@@ -450,11 +462,10 @@ class parseFile(object):
 
 if '__main__' == __name__:
     fileName = "palprogs"
-    fileName +=".pal"
     programs = parseFile(fileName)
 
-    for entry in programs.varList:
-        print("var",entry)
+    for entry in programs.labels:
+        print("labels",entry)
 
     for line in programs.code:
         print(str(line[0]).ljust(3), line[1].ljust(25), line[2])
