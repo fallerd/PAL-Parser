@@ -19,16 +19,32 @@ class parseFile(object):
     index = 0
 
     def __init__(self, fileName):
-        self.file = open(fileName + ".pal")
-        self.scanFile(self.file)
+        file = open(fileName + ".pal")
+        self.scanFile(file)
         self.checkOrphans()
         self.outputErrorFile(fileName + ".log")
 
 
     def outputErrorFile(self, fileName):
-        f = open(fileName, 'w')
-        f.write('hello world')
-        f.close()
+        self.index = 0
+        errorLog = open(fileName, 'w')
+        errorLog.write("PAL Program Listing:\n\n")
+        for entry in self.code:
+            errorLog.write((str(entry[0])+".").ljust(4) + entry[1] + "\n")
+            if entry[2] is not '':
+                errorLog.write("    ** " + entry[2] + "\n")
+                self.index += 1
+        errorLog.write("\nSummary: -----------------------------------------------\n\n")
+        errorLog.write("Total errors:" + str(self.index) + "\n")
+        for entry in self.code:
+            if entry[2] is not '':
+                errorLog.write("   " + entry[2] + "\n")
+        errorLog.write("\nProcessing Complete: ")
+        if self.index is not 0:
+            errorLog.write("PAL program is not valid")
+        else:
+            errorLog.write("PAL program is valid")
+        errorLog.close()
 
 
     # scan file, remove comments, ignore blanks, remove leading whitespace
@@ -48,7 +64,6 @@ class parseFile(object):
                 if definedVar[0] == variable[0]:
                     linkedVar = True
             if not linkedVar:
-                #print("NOT LINKED", variable[0], variable[1], variable[2])
                 if not self.code[variable[2]][2]:
                     self.code[variable[2]][2] = "Variable has invalid DEF stmt or never defined: \'{0}\'".format(variable[0])
             else:
@@ -59,7 +74,6 @@ class parseFile(object):
                 if label[0] == labelled[0]:
                     linkedLabel = True
             if not linkedLabel:
-                print("not linked:", label)
                 self.code[label[2]][2] = "Branch label on invalid line or never defined: \'{0}\'".format(label[0])
             else:
                 linkedLabel = False
@@ -457,15 +471,12 @@ class parseFile(object):
                 self.define = False
             return
         else:
-            return "Command unknown"
+            return "Command unknown: Line {0}".format(lineNum+1)
 
 
 if '__main__' == __name__:
     fileName = "palprogs"
     programs = parseFile(fileName)
 
-    for entry in programs.labels:
-        print("labels",entry)
-
-    for line in programs.code:
-        print(str(line[0]).ljust(3), line[1].ljust(25), line[2])
+    #for line in programs.code:
+        #print(str(line[0]).ljust(3), line[1].ljust(25), line[2])
