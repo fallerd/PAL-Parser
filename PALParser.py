@@ -17,12 +17,13 @@ class parseFile(object):
     labels = [[],[]]
     define = False
     index = 0
+    errors = [0]*8
 
     def __init__(self, fileName):
         file = open(fileName + ".pal")
         self.scanFile(file)
         self.checkOrphans()
-        self.outputErrorFile(fileName + ".log")
+        #self.outputErrorFile(fileName + ".log")
 
 
     def outputErrorFile(self, fileName):
@@ -47,7 +48,7 @@ class parseFile(object):
         errorLog.close()
 
 
-    # scan file, remove comments, ignore blanks, remove leading whitespace
+    # scan file, remove comments, ignore blanks, remove leading/trailing whitespace
     def scanFile(self, file):
         for lineNum, line in enumerate(file):
             line = self.removeComment(line)
@@ -112,11 +113,25 @@ class parseFile(object):
             line = line.split(':', 1)[-1].lstrip()
         if ('MOVE' in line[0:4]):
             line = line[4:].lstrip()
+            operands = line.count(",")
+            if operands < 1:
+                self.errors[3] += 1
+                return "Too few operands"
+            elif operands > 1:
+                self.errors[2] += 1
+                return "Too many operands"
             args = self.get2args(line)
             return self.validateMoveArgs(args[0], args[1], lineNum)
 
         if ('COPY' in line[0:4]):
             line = line[4:].lstrip()
+            operands = line.count(",")
+            if operands < 1:
+                self.errors[3] += 1
+                return "Too few operands"
+            elif operands > 1:
+                self.errors[2] += 1
+                return "Too many operands"
             args = self.get2args(line)
             return self.validate2RegArgs(args[0], args[1], lineNum)
 
@@ -125,12 +140,23 @@ class parseFile(object):
                 ('MUL' in line[0:3]) or \
                 ('DIV' in line[0:3]):
             line = line[3:].lstrip()
+            operands = line.count(",")
+            if operands < 2:
+                self.errors[3] += 1
+                return "Too few operands"
+            elif operands > 2:
+                self.errors[2] += 1
+                return "Too many operands"
             args = self.get3args(line)
             return self.validate3RegArgs(args[0], args[1], args[2], lineNum)
 
         if ('INC' in line[0:3]) or \
                 ('DEC' in line[0:3]):
             line = line[3:].lstrip()
+            operands = line.count(",")
+            if operands > 0:
+                self.errors[2] += 1
+                return "Too many operands"
             if self.isRegister(line) is True:
                 return
             else:
@@ -154,6 +180,7 @@ class parseFile(object):
             if labelValidated is not None:
                 return labelValidated
             if self.findLabels("branchFrom", label):
+                self.errors[6] += 1
                 return "Ambiguous label: \'{0}\' in use multiple times".format(label)
             else:
                 self.labels[1].append([label, lineNum + 1])
@@ -164,6 +191,7 @@ class parseFile(object):
 
         if ('DEF' in line[0:3]):
             if self.define is False:
+                self.errors[7] += 1
                 return "DEF commands must follow SRT or DEF"
             noDEF = line[4:]
             varName = noDEF.split(',', 1)[0]
@@ -173,6 +201,7 @@ class parseFile(object):
             if not self.findVars('defined', varName):
                 self.varList[0].append([varName, lineNum + 1])
             else:
+                self.errors[6] += 1
                 return "Var name already defined in namespace: \'{0}\'".format(varName)
             varLoc = noDEF.split(',', 1)[-1].lstrip()
             if self.validateLoc(varLoc):
@@ -194,6 +223,13 @@ class parseFile(object):
     # returns label from branch line
     def checkBranchArgs(self, line, lineNum):
         if ('BEQ' in line[0:3]) or ('BGT' in line[0:3]):
+            operands = line.count(",")
+            if operands < 2:
+                self.errors[3] += 1
+                return "Too few operands"
+            elif operands > 2:
+                self.errors[2] += 1
+                return "Too many operands"
             args = self.get2args(line[3:].lstrip().rsplit(',', 1)[0])
             return self.validate2RegArgs(args[0], args[1], lineNum)
         return
@@ -258,9 +294,11 @@ class parseFile(object):
     # checks args for move command
     def validateMoveArgs(self, arg1, arg2, lineNum):
         if len(arg1) < 1:
+            self.errors[4] += 1
             return "Value length invalid"
         for char in arg1:
             if self.isOctalDigit(char) is False:
+                self.errors[5] += 1
                 return "Values must be octal digits only: \'{0}\'".format(arg1)
         if self.isRegister(arg2):
             return
@@ -322,18 +360,22 @@ class parseFile(object):
     # validates labels
     def validateLabel(self, label):
         if len(label) > 5 or len(label) < 1:
+            self.errors[0] += 1
             return "Variable or Label name length invalid: \'{0}\'".format(label)
         for char in label:
             if self.isLetter(char) is False:
+                self.errors[4] += 1
                 return "Variable or Label names must be letters only: \'{0}\'".format(label)
 
 
     # validates memory locations
     def validateLoc(self, loc):
         if len(loc) < 1:
+            self.errors[4] += 1
             return "Memory location length invalid"
         for char in loc:
             if self.isOctalDigit(char) is False:
+                self.errors[5] += 1
                 return "Memory locations must be octal digits only"
 
 
@@ -341,10 +383,11 @@ class parseFile(object):
     def getBranchLabel(self, line):
         if ('BEQ' in line[0:3]) or ('BGT' in line[0:3]):
             label = line.rsplit(',', 1)[-1].lstrip()
+            return label
         if ('BR' in line[0:2]):
             label = line[2:]
             label = label.lstrip()
-        return label
+            return label
 
 
     # find starts and ends, return errors
@@ -358,10 +401,12 @@ class parseFile(object):
                 else:
                     self.start = True
                     ind = self.starts.index(lineNum)
+                    self.errors[7] += 1
                     return 'Program already has SRT at line {0}'.format(self.starts[ind - 1] + 1)
             else:
                 self.start = True
                 ind = self.starts.index(lineNum)
+                self.errors[7] += 1
                 return 'SRT stmt at line {0} has extra characters'.format(self.starts[ind] + 1)
 
         if ("END" in line) and ('BEQ' not in line) and ('BR' not in line) and ('BGT' not in line) and ('DEF' not in line):
@@ -371,9 +416,11 @@ class parseFile(object):
                     self.start = False
                 else:
                     self.start = False
+                    self.errors[7]+=1
                     return 'END at line {0} does not have matching SRT'.format(lineNum + 1)
             else:
                 self.start = False
+                self.errors[7] += 1
                 return 'END stmt at line {0} has extra characters'.format(lineNum + 1)
 
 
@@ -384,6 +431,7 @@ class parseFile(object):
             return noComment
         else:
             return line
+
 
     # finds letters without regex
     def isLetter(self, char):
@@ -418,7 +466,8 @@ class parseFile(object):
         else:
             return False
 
-        # finds octal digits without regex
+
+    # finds octal digits without regex
     def isOctalDigit(self, char):
         if char == '0' or \
                 char == '1' or \
@@ -431,6 +480,7 @@ class parseFile(object):
             return True
         else:
             return False
+
 
     # checks register validity
     def isRegister(self, string):
@@ -446,10 +496,12 @@ class parseFile(object):
         else:
             return False
 
+
     # finds labels, returns errors
     def commandCheck(self, lineNum, line):
         noLabel = line.split(':', 1)[-1].lstrip()
         if noLabel.replace(' ', '') == '':
+            self.errors[1] += 1
             return "Label must be followed by a command"
         if ('DEF' in noLabel[0:3]) or \
                 ('MOVE' in noLabel[0:4]) or \
@@ -471,12 +523,24 @@ class parseFile(object):
                 self.define = False
             return
         else:
-            return "Command unknown: Line {0}".format(lineNum+1)
+            self.errors[1] += 1
+            return "Invalid opcode: Line {0}".format(lineNum+1)
 
 
 if '__main__' == __name__:
     fileName = "palprogs"
     programs = parseFile(fileName)
 
-    #for line in programs.code:
-        #print(str(line[0]).ljust(3), line[1].ljust(25), line[2])
+    for line in programs.code:
+        print(str(line[0]).ljust(3), line[1].ljust(25), line[2])
+    print("\nERROR COUNT:", sum(programs.errors))
+    if programs.errors[0]: print("Ill-formed label/variable names:", programs.errors[0])
+    if programs.errors[1]: print("Invalid opcodes:", programs.errors[1])
+    if programs.errors[2]: print("Too many operands:", programs.errors[2])
+    if programs.errors[3]: print("Too few operands:", programs.errors[3])
+    if programs.errors[4]: print("Ill-formed operands:", programs.errors[4])
+    if programs.errors[5]: print("Wrong operand type:", programs.errors[5])
+    if programs.errors[6]: print("Label/Variable structure problems:", programs.errors[6])
+    if programs.errors[7]: print("Bad code structure (SRT/END/DEF):", programs.errors[7])
+    #if programs.errors[8]: print("Ill-formed labels:", programs.errors[8])
+    #if programs.errors[9]: print("Ill-formed labels:", programs.errors[9])
