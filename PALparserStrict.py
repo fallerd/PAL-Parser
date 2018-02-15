@@ -1,6 +1,5 @@
 from __future__ import print_function
-from sys import stdin
-import unittest
+import sys
 
 '''
 Description: PAL Parser for PPL
@@ -22,30 +21,6 @@ class parseFile(object):
     def __init__(self, fileName):
         file = open(fileName + ".pal")
         self.scanFile(file, fileName)
-        self.checkOrphans()
-        #self.outputErrorFile(fileName + ".log")
-
-
-    def outputErrorFile(self, fileName):
-        self.index = 0
-        errorLog = open(fileName, 'w')
-        errorLog.write("PAL Program Listing:\n\n")
-        for entry in self.code:
-            errorLog.write((str(entry[0])+".").ljust(4) + entry[1] + "\n")
-            if entry[2] is not '':
-                errorLog.write("    ** " + entry[2] + "\n")
-                self.index += 1
-        errorLog.write("\nSummary: -----------------------------------------------\n\n")
-        errorLog.write("Total errors:" + str(self.index) + "\n")
-        for entry in self.code:
-            if entry[2] is not '':
-                errorLog.write("   " + entry[2] + "\n")
-        errorLog.write("\nProcessing Complete: ")
-        if self.index is not 0:
-            errorLog.write("PAL program is not valid")
-        else:
-            errorLog.write("PAL program is valid")
-        errorLog.close()
 
 
     # scan file, remove comments, ignore blanks, remove leading/trailing whitespace
@@ -58,6 +33,7 @@ class parseFile(object):
             if len(line.strip()) != 0:
                 errorLog.write((str(lineNum + 1) + ".").ljust(4) + line + "\n")
                 self.parseLine(lineNum, line.strip("\n"), errorLog)
+        self.checkOrphans(errorLog)
         self.errorLogFooter(errorLog)
         errorLog.close()
 
@@ -74,32 +50,35 @@ class parseFile(object):
 
     # create errorlog footer
     def errorLogFooter(self, errorLog):
-        self.index = 0
-        for entry in self.code:
-            if entry[2] is not '':
-                self.index += 1
-        errorLog.write("\nSummary: -----------------------------------------------\n\n")
-        errorLog.write("Total errors:" + str(self.index) + "\n")
-        for entry in self.code:
-            if entry[2] is not '':
-                errorLog.write("   " + entry[2] + "\n")
+        totalErrors = sum(self.errors)
+        errorLog.write("\nSummary: -----------------------------------------------\n")
+        errorLog.write("\nTotal errors: " + str(totalErrors))
+        if self.errors[0]: errorLog.write("\n    " + str(self.errors[0]) + " - Ill-formed label/variable names")
+        if self.errors[1]: errorLog.write("\n    " + str(self.errors[1]) + " - Invalid opcodes" )
+        if self.errors[2]: errorLog.write("\n    " + str(self.errors[2]) + " - Too many operands")
+        if self.errors[3]: errorLog.write("\n    " + str(self.errors[3]) + " - Too few operands")
+        if self.errors[4]: errorLog.write("\n    " + str(self.errors[4]) + " - Ill-formed operands")
+        if self.errors[5]: errorLog.write("\n    " + str(self.errors[5]) + " - Wrong operand type")
+        if self.errors[6]: errorLog.write("\n    " + str(self.errors[6]) + " - Label/Variable structure problems")
+        if self.errors[7]: errorLog.write("\n    " + str(self.errors[7]) + " - Bad code structure (SRT/END/DEF)")
         errorLog.write("\nProcessing Complete: ")
-        if self.index is not 0:
+        if totalErrors is not 0:
             errorLog.write("PAL program is not valid")
         else:
             errorLog.write("PAL program is valid")
 
 
-    # checks var and label lists for orphans and marks those lines with errors
-    def checkOrphans(self):
+    # checks var and label lists for orphans and lists them before summary
+    def checkOrphans(self, errorLog):
+        errorLog.write("\nOrphaned Variables and Branch Labels:\n")
         linkedVar = False
         for variable in self.varList[1]:
             for definedVar in self.varList[0]:
                 if definedVar[0] == variable[0]:
                     linkedVar = True
             if not linkedVar:
-                if not self.code[variable[2]][2]:
-                    self.code[variable[2]][2] = "Variable has invalid DEF stmt or never defined: \'{0}\'".format(variable[0])
+                self.errors[6]+=1
+                errorLog.write("    Line {1}: Variable has invalid DEF stmt or never defined: \'{0}\'\n".format(variable[0], variable[1]))
             else:
                 linkedVar = False
         linkedLabel = False
@@ -108,7 +87,8 @@ class parseFile(object):
                 if label[0] == labelled[0]:
                     linkedLabel = True
             if not linkedLabel:
-                self.code[label[2]][2] = "Branch label on invalid line or never defined: \'{0}\'".format(label[0])
+                self.errors[6]+=1
+                errorLog.write("    Line {1}: Branch label on invalid line or never defined: \'{0}\'\n".format(label[0], label[1]))
             else:
                 linkedLabel = False
         return
@@ -565,19 +545,5 @@ class parseFile(object):
 
 
 if '__main__' == __name__:
-    fileName = "palprogs"
+    fileName = sys.argv[1]
     programs = parseFile(fileName)
-
-    for line in programs.code:
-        print(str(line[0]).ljust(3), line[1].ljust(25), line[2])
-    print("\nERROR COUNT:", sum(programs.errors))
-    if programs.errors[0]: print("Ill-formed label/variable names:", programs.errors[0])
-    if programs.errors[1]: print("Invalid opcodes:", programs.errors[1])
-    if programs.errors[2]: print("Too many operands:", programs.errors[2])
-    if programs.errors[3]: print("Too few operands:", programs.errors[3])
-    if programs.errors[4]: print("Ill-formed operands:", programs.errors[4])
-    if programs.errors[5]: print("Wrong operand type:", programs.errors[5])
-    if programs.errors[6]: print("Label/Variable structure problems:", programs.errors[6])
-    if programs.errors[7]: print("Bad code structure (SRT/END/DEF):", programs.errors[7])
-    #if programs.errors[8]: print("Ill-formed labels:", programs.errors[8])
-    #if programs.errors[9]: print("Ill-formed labels:", programs.errors[9])
